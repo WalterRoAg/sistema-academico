@@ -4,7 +4,7 @@ FROM php:8.2-fpm
 # Directorio de trabajo
 WORKDIR /var/www/html
 
-# Instalamos dependencias del sistema (para postgres Y AHORA PARA GD)
+# Instalamos dependencias del sistema (postgres, GD, y AHORA ZIP)
 RUN apt-get update && apt-get install -y \
     zip \
     unzip \
@@ -14,13 +14,14 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
+    libzip-dev \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Instalamos las extensiones de PHP (pdo_pgsql Y AHORA GD)
+# Instalamos las extensiones de PHP (pdo_pgsql, GD, y AHORA ZIP)
 # 1. Configuramos GD con soporte para fuentes y imágenes
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg
-# 2. Instalamos GD y pdo_pgsql
-RUN docker-php-ext-install -j$(nproc) gd pdo pdo_pgsql
+# 2. Instalamos GD, pdo_pgsql, y zip
+RUN docker-php-ext-install -j$(nproc) gd pdo pdo_pgsql zip
 
 # Instalamos Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
