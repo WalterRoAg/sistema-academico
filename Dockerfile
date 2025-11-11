@@ -39,9 +39,10 @@ COPY start.sh .
 # 10. Generamos el autoloader
 RUN composer dump-autoload --optimize
 
-# 11. Damos permisos
+# 11. Damos permisos Y LIMPIAMOS EL SCRIPT (¡NUEVO!)
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-RUN chmod +x ./start.sh # <-- ¡Hacemos que el script sea ejecutable!
+RUN chmod +x ./start.sh
+RUN sed -i 's/\r$//' ./start.sh # <-- ESTA LÍNEA LIMPIA EL SCRIPT
 
 # 12. Exponemos el puerto
 EXPOSE 8000
