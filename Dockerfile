@@ -1,5 +1,5 @@
 # Usamos una imagen de PHP 8.2 (puedes cambiar la versión si usas otra)
-FROM shivammathur/php:8.2
+FROM php:8.2-fpm
 
 # Directorio de trabajo
 WORKDIR /var/www/html
@@ -39,3 +39,4 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 EXPOSE 8000
 
 CMD ["php", "artisan", "serve", "--host", "0.0.0.0", "--port", "8000"]
+
