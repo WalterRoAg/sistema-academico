@@ -42,6 +42,5 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 # 11. Exponemos el puerto
 EXPOSE 8000
 
-# 12. COMANDO DE INICIO (Con el truco de la migración incluido)
-# Esto SÍ funciona con "sh -c" porque está dentro del archivo
-CMD sh -c "php artisan migrate:fresh --seed && php artisan serve --host 0.0.0.0 --port 8000"
+# 12. COMANDO DE INICIO (Con el truco de la migración y la sintaxis "exec" correcta)
+CMD ["sh", "-c", "php artisan migrate:fresh --seed && php artisan serve --host 0.0.0.0 --port 8000"]
