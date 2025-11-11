@@ -30,8 +30,8 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 COPY composer.json composer.lock ./
 
 # Instalamos las dependencias de PHP
-RUN composer install --no-dev --optimize-autoloader
 
+RUN composer install --no-dev --no-autoloader --no-scripts
 # Copiamos el resto de la aplicación
 COPY . .
 
