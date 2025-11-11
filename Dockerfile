@@ -1,10 +1,10 @@
-# Usamos la imagen oficial de PHP 8.2
+# 1. Usamos la imagen oficial de PHP 8.2
 FROM php:8.2-fpm
 
-# Directorio de trabajo
+# 2. Directorio de trabajo
 WORKDIR /var/www/html
 
-# Instalamos dependencias del sistema (postgres, GD, y AHORA ZIP)
+# 3. Instalamos dependencias del sistema (postgres, GD, y ZIP)
 RUN apt-get update && apt-get install -y \
     zip \
     unzip \
@@ -17,30 +17,28 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Instalamos las extensiones de PHP (pdo_pgsql, GD, y AHORA ZIP)
-# 1. Configuramos GD con soporte para fuentes y imágenes
+# 4. Instalamos las extensiones de PHP (pdo_pgsql, GD, y ZIP)
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg
-# 2. Instalamos GD, pdo_pgsql, y zip
 RUN docker-php-ext-install -j$(nproc) gd pdo pdo_pgsql zip
 
-# Instalamos Composer
+# 5. Instalamos Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copiamos solo los archivos de dependencias primero
+# 6. Copiamos solo los archivos de dependencias primero
 COPY composer.json composer.lock ./
 
-# Instalamos las dependencias de PHP
-
+# 7. Instalamos las dependencias de PHP (sin scripts para evitar error de artisan)
 RUN composer install --no-dev --no-autoloader --no-scripts
-# Copiamos el resto de la aplicación
+
+# 8. Copiamos el resto de la aplicación (AHORA sí copiamos artisan)
 COPY . .
 
-# Generamos el autoloader de clases
+# 9. Generamos el autoloader (AHORA sí podemos correr scripts)
 RUN composer dump-autoload --optimize
 
-# Damos permisos a las carpetas de Laravel
+# 10. Damos permisos a las carpetas de Laravel
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Exponemos el puerto y definimos el comando de inicio
+# 11. Exponemos el puerto y definimos el comando de inicio
 EXPOSE 8000
 CMD ["php", "artisan", "serve", "--host", "0.0.0.0", "--port", "8000"]
