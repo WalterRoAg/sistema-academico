@@ -1,26 +1,8 @@
 services:
-  # 1. El Servicio Web (Tu App Laravel)
   - type: web
     name: sistema-academico
     runtime: php
     branch: main
     buildCommand: "composer install --no-dev --optimize-autoloader"
     startCommand: "php artisan serve --host 0.0.0.0 --port $PORT"
-    envVars:
-      - key: APP_URL
-        # El valor lo pondremos en el dashboard
-      - key: APP_KEY
-        # El valor lo pondremos en el dashboard
-      - key: DATABASE_URL
-        # Esta es la URL de tu base de datos existente
-        value: postgresql://sistema_academico_db_5p8r_user:wSxOA5tEGjaSfXjs08HvBI1lNnMJhNfQ@dpg-d49mmdripnbc7395evt0-a/sistema_academico_db_5p8r
-      - key: APP_ENV
-        value: production
-      - key: APP_DEBUG
-        value: false
-      - key: LOG_CHANNEL
-        value: stderr
-      - key: SESSION_DRIVER
-        value: database
-      - key: QUEUE_CONNECTION
-        value: database
+    healthCheckPath: "/"
