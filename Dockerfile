@@ -27,18 +27,21 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # 6. Copiamos solo los archivos de dependencias primero
 COPY composer.json composer.lock ./
 
-# 7. Instalamos las dependencias de PHP (sin scripts para evitar error de artisan)
+# 7. Instalamos las dependencias de PHP
 RUN composer install --no-dev --no-autoloader --no-scripts
 
-# 8. Copiamos el resto de la aplicación (AHORA sí copiamos artisan)
+# 8. Copiamos el resto de la aplicación
 COPY . .
 
-# 9. Generamos el autoloader (AHORA sí podemos correr scripts)
+# 9. Generamos el autoloader
 RUN composer dump-autoload --optimize
 
 # 10. Damos permisos a las carpetas de Laravel
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# 11. Exponemos el puerto y definimos el comando de inicio
+# 11. Exponemos el puerto
 EXPOSE 8000
-CMD ["php", "artisan", "serve", "--host", "0.0.0.0", "--port", "8000"]
+
+# 12. COMANDO DE INICIO (Con el truco de la migración incluido)
+# Esto SÍ funciona con "sh -c" porque está dentro del archivo
+CMD sh -c "php artisan migrate:fresh --seed && php artisan serve --host 0.0.0.0 --port 8000"
