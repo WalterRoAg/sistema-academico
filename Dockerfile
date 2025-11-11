@@ -1,20 +1,26 @@
-# Usamos una imagen de PHP 8.2 (puedes cambiar la versión si usas otra)
+# Usamos la imagen oficial de PHP 8.2
 FROM php:8.2-fpm
 
 # Directorio de trabajo
 WORKDIR /var/www/html
 
-# Instalamos dependencias del sistema (para postgres)
+# Instalamos dependencias del sistema (para postgres Y AHORA PARA GD)
 RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     git \
     curl \
     libpq-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Instalamos la extensión de PHP para PostgreSQL
-RUN docker-php-ext-install pdo pdo_pgsql
+# Instalamos las extensiones de PHP (pdo_pgsql Y AHORA GD)
+# 1. Configuramos GD con soporte para fuentes y imágenes
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg
+# 2. Instalamos GD y pdo_pgsql
+RUN docker-php-ext-install -j$(nproc) gd pdo pdo_pgsql
 
 # Instalamos Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -34,9 +40,6 @@ RUN composer dump-autoload --optimize
 # Damos permisos a las carpetas de Laravel
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Exponemos el puerto que usa `artisan serve`
-
+# Exponemos el puerto y definimos el comando de inicio
 EXPOSE 8000
-
 CMD ["php", "artisan", "serve", "--host", "0.0.0.0", "--port", "8000"]
-
