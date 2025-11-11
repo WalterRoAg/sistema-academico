@@ -33,16 +33,18 @@ RUN composer install --no-dev --no-autoloader --no-scripts
 # 8. Copiamos el resto de la aplicación
 COPY . .
 
-# 9. Generamos el autoloader
+# 9. Copiamos el nuevo script de inicio
+COPY start.sh .
+
+# 10. Generamos el autoloader
 RUN composer dump-autoload --optimize
 
-# 10. Damos permisos a las carpetas de Laravel
+# 11. Damos permisos
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chmod +x ./start.sh # <-- ¡Hacemos que el script sea ejecutable!
 
-# 11. Exponemos el puerto
+# 12. Exponemos el puerto
 EXPOSE 8000
 
-# 12. COMANDO DE INICIO (Con el truco de la migración y la sintaxis "exec" correcta)
-CMD ["php", "artisan", "serve", "--host", "0.0.0.0", "--port", "8000"]
-
-
+# 13. COMANDO DE INICIO (Simplemente ejecuta el script)
+CMD ["./start.sh"]
